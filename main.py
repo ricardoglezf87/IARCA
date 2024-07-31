@@ -35,7 +35,6 @@ def geocode_location(latitude, longitude):
         location = geolocator.reverse((latitude, longitude))
         if location and location.raw.get('address'):       
             address = location.raw['address']
-            #print(f"Procesando dirección: {address}") 
             city = address.get('city', '')
             tourim =  address.get('tourism', '')
             if tourim:
@@ -49,13 +48,16 @@ def geocode_location(latitude, longitude):
 def get_date_taken(exif_data, file_path):
     date = exif_data.get('DateTime')
     if date:
-        return date.split(" ")[0].split(":")[0]  # Extract year
+        date_parts = date.split(" ")[0].split(":")  # Extract date parts (year, month, day)
+        year = date_parts[0]
+        month = date_parts[1]
+        return year, month
     
     # If DateTime is not available in EXIF data, get file creation and modification date
     file_creation_time = os.path.getctime(file_path)
     file_modification_time = os.path.getmtime(file_path)
     min_time = min(file_creation_time, file_modification_time)
-    return datetime.fromtimestamp(min_time).year
+    return datetime.fromtimestamp(min_time).year, datetime.fromtimestamp(min_time).month
 
 # Función para mover archivos
 def move_file(src_path, dst_path):
@@ -71,21 +73,21 @@ def process_photos(src_directory, dst_directory):
                 print(f"Procesando: {file_path}") 
 
                 exif_data = get_exif_data(file_path)
-                date_taken = get_date_taken(exif_data,file_path)                
+                year_taken, month_taken = get_date_taken(exif_data,file_path)                
                 geolocation = get_geolocation(exif_data)
 
                 if geolocation:
                     city = geocode_location(*geolocation)
                     print(f"Encontrada localizacion: {file_path} -  {city}") 
-                    if date_taken and city:
-                        print(f"Encontrada fecha: {file_path} - {date_taken}") 
-                        dst_path = os.path.join(dst_directory, str(date_taken), city, file)                        
+                    if year_taken and city:
+                        print(f"Encontrada fecha: {file_path} - {month_taken}") 
+                        dst_path = os.path.join(dst_directory, str(year_taken), str(month_taken), city, file)                        
                         move_file(file_path, dst_path) 
                         continue                   
                                   
-                if date_taken:
-                    print(f"Encontrada fecha: {file_path} - {date_taken}") 
-                    dst_path = os.path.join(dst_directory, str(date_taken), file)                        
+                if year_taken:
+                    print(f"Encontrada fecha: {file_path} - {year_taken} - {month_taken}") 
+                    dst_path = os.path.join(dst_directory, str(year_taken), str(month_taken), file)                        
                     move_file(file_path, dst_path)
                 else:
                     print(f"No tiene fecha ni geolocalizacion: {file_path}")
