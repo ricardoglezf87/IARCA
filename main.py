@@ -5,6 +5,7 @@ from PIL import Image
 from PIL.ExifTags import TAGS
 from geopy.geocoders import Nominatim
 import imagehash
+import uuid
 
 src_directory = 'C:\\Users\\rgonzafa\\Desktop\\Prueba'
 dst_directory = 'C:\\Users\\rgonzafa\\Desktop\\Mov'
@@ -19,11 +20,14 @@ def process_file(file_path, dst_path, file):
                 print(f"Procesando duplicado: {dfile_path}") 
                 if is_duplicate(file_path, dfile_path):
                     duplicate_found = True
-                    move_file(file_path, os.path.join(dst_path,"Duplicados", file))
+                    guid = uuid.uuid4()
+                    file_extension = os.path.splitext(file_path)[1]
+                    new_file_name = f"{guid}{file_extension}"
+                    move_file(file_path, os.path.join(dst_path,"Duplicados", new_file_name))
                     return None
             
     if not duplicate_found:
-        move_file(file_path, dst_path)
+        move_file(file_path, os.path.join(dst_path,file))
         
 
 def is_duplicate(image_path1, image_path2):
