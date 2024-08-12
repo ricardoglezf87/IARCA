@@ -38,11 +38,14 @@ def classify_image(filename):
     
     # Clasificar la imagen
     predictions = model.predict(x)
-    decoded_predictions = tf.keras.applications.mobilenet.decode_predictions(predictions, top=3)[0]
+    predicted_class = np.argmax(predictions, axis=1)[0]
+    categories = ['screenshot', 'meme', 'paisajes', 'animales', 'buceo', 'normales', 'juegos']
+    predicted_label = categories[predicted_class]
     
     return jsonify({
         'filename': filename,
-        'predictions': [{ 'class': pred[1], 'score': float(pred[2]) } for pred in decoded_predictions]
+        'prediction': predicted_label,
+        'confidence': float(predictions[0][predicted_class])
     })
 
 # Ruta para servir las imágenes
@@ -52,7 +55,9 @@ def image(filename):
 
 def select_image():
     images = os.listdir('data/images/to_classify')
-    return np.random.choice(images)
+    if images:
+        return np.random.choice(images)
+    return None
 
 def save_feedback(image_path, user_label):
     with open('data/feedback.txt', 'a') as f:
