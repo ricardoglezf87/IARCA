@@ -1,11 +1,12 @@
 import tensorflow as tf
+from tensorflow.keras import layers
 from tensorflow.keras.applications import MobileNet
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 # Definir las categorías
-categories = ['screenshot', 'meme', 'paisajes', 'animales', 'buceo', 'normales']
+categories = ['screenshot', 'meme', 'paisaje', 'animal', 'buceo', 'normal', 'juego']
 
 # Cargar MobileNet preentrenado
 base_model = MobileNet(weights='imagenet', include_top=False, input_shape=(224, 224, 3))
@@ -47,4 +48,4 @@ train_generator = train_datagen.flow_from_directory(
 model.fit(train_generator, epochs=10, steps_per_epoch=100)
 
 # Guardar el modelo
-model.save('models/model.h5')
+model.save('models/model.keras')
