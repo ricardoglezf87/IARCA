@@ -6,7 +6,7 @@ from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 # Definir las categorías
-categories = ['screenshot', 'meme', 'paisaje', 'animal', 'buceo', 'normal', 'juego']
+categories = ['paisaje', 'animal', 'buceo', 'normal', 'borrosa','descartar']
 
 # Cargar MobileNet preentrenado
 base_model = MobileNet(weights='imagenet', include_top=False, input_shape=(224, 224, 3))

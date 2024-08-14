@@ -16,13 +16,12 @@
         <img src="{{ url_for('image', filename=image) }}" alt="Image to classify">
     </div>
     <div class="buttons">
-        <button onclick="sendFeedback('screenshot')">Screenshot</button>
-        <button onclick="sendFeedback('meme')">Meme</button>
         <button onclick="sendFeedback('paisaje')">Paisaje</button>
         <button onclick="sendFeedback('animal')">Animal</button>
         <button onclick="sendFeedback('buceo')">Buceo</button>
         <button onclick="sendFeedback('normal')">Normal</button>
-        <button onclick="sendFeedback('juego')">Juego</button>
+        <button onclick="sendFeedback('borrosa')">Borrosa</button>
+        <button onclick="sendFeedback('descartar')">Descartar</button>
     </div>
     <div id="results">
         <p>Clasificación:</p>

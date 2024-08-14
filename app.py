@@ -4,11 +4,10 @@ import numpy as np
 import os
 import piexif
 from PIL import Image
-from PIL.ExifTags import TAGS
 
 app = Flask(__name__)
 
-categories = ['screenshot', 'meme', 'paisaje', 'animal', 'buceo', 'normal', 'juego']   
+categories = ['paisaje', 'animal', 'buceo', 'normal', 'borrosa','descartar']   
 
 # Cargar el modelo preentrenado
 model = tf.keras.models.load_model('models/model.keras')
@@ -117,7 +116,7 @@ def update_exif_with_label(file_image, label):
 
         if 41729 in exif_dict['Exif'] and isinstance(exif_dict['Exif'][41729], int):
             exif_dict['Exif'][41729] = str(exif_dict['Exif'][41729]).encode('utf-8')
-
+        
         # Convertir de nuevo el diccionario EXIF a formato binario
         exif_bytes = piexif.dump(exif_dict)
         
