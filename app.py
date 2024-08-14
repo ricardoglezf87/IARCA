@@ -102,34 +102,27 @@ def update_exif_with_label(file_image, label):
     image_path = os.path.join('data/images/to_classify', file_image)
     
     # Abrir la imagen
-    img = Image.open(image_path)
-    
-    # Obtener la información EXIF actual o crear un diccionario vacío si no tiene EXIF
-    exif_dict = piexif.load(img.info['exif']) if 'exif' in img.info else {"0th": {}, "Exif": {}, "GPS": {}, "1st": {}, "thumbnail": None}
-    
-    # Obtener las etiquetas actuales en XPKeywords (ID 0x9C9E) si existen
-    existing_tags = exif_dict['0th'].get(0x9C9E, b'')
-    
-    if existing_tags:
-        # Decodificar las etiquetas existentes desde UTF-16LE a una cadena
-        existing_tags_str = existing_tags.decode('utf-16le').rstrip('\x00')
-        # Concatenar la nueva etiqueta a las existentes
-        combined_tags = f"{existing_tags_str};{label}"
-    else:
-        # No hay etiquetas previas, usar la nueva etiqueta como única
-        combined_tags = label
-    
-    # Codificar la nueva lista de etiquetas en UTF-16LE
-    tag_bytes = combined_tags.encode('utf-16le')
-    
-    # Actualizar la etiqueta en XPKeywords (ID 0x9C9E)
-    exif_dict['0th'][0x9C9E] = tag_bytes
-    
-    # Convertir de nuevo el diccionario EXIF a formato binario
-    exif_bytes = piexif.dump(exif_dict)
-    
-    # Guardar la imagen con la nueva información EXIF
-    img.save(image_path, "jpeg", exif=exif_bytes)
+    with Image.open(image_path) as img:
+        # Obtener la información EXIF actual o crear un diccionario vacío si no tiene EXIF
+        if 'exif' in img.info:
+            exif_dict = piexif.load(img.info['exif'])
+        else:
+            exif_dict = {"0th": {}, "Exif": {}, "GPS": {}, "1st": {}, "thumbnail": None}
+        
+        # Codificar la nueva etiqueta en UTF-16LE
+        tag_bytes = label.encode('utf-16le')
+        
+        # Actualizar la etiqueta en XPKeywords (ID 0x9C9E)
+        exif_dict['0th'][0x9C9E] = tag_bytes
+
+        if 41729 in exif_dict['Exif'] and isinstance(exif_dict['Exif'][41729], int):
+            exif_dict['Exif'][41729] = str(exif_dict['Exif'][41729]).encode('utf-8')
+
+        # Convertir de nuevo el diccionario EXIF a formato binario
+        exif_bytes = piexif.dump(exif_dict)
+        
+        # Guardar la imagen con la nueva información EXIF
+        img.save(image_path, "jpeg", exif=exif_bytes)
 
 def get_unlabeled_images(directory):
     unlabeled_images = []
